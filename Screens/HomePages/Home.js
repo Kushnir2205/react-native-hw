@@ -48,7 +48,7 @@ const Home = () => {
             />
           ),
           tabBarButton: (props) => (
-            <TouchableOpacityBase {...props} style={styles.btnTab} />
+            <TouchableOpacity {...props} style={styles.btnTab} />
           ),
           tabBarIcon: ({ color }) => {
             return <SvgGrid stroke={color} />;

@@ -14,8 +14,10 @@ import {
 } from "react-native";
 
 import backgroundImg from "../../assets/image/Photo_background.jpg";
+import { useNavigation } from "@react-navigation/native";
 
 const LoginScreen = () => {
+  const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -111,7 +113,10 @@ const LoginScreen = () => {
             <TouchableOpacity style={styles.btn} onPress={onSubmitUserRegister}>
               <Text style={styles.btnText}>Увійти</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.link}>
+            <TouchableOpacity
+              style={styles.link}
+              onPress={() => navigation.navigate("Registration")}
+            >
               <Text style={styles.linkText}>
                 Немає акаунту?{" "}
                 <Text style={styles.linkTextUnderline}>Зареєструватися</Text>
@@ -155,7 +160,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "Roboto",
     fontStyle: "normal",
-    fontWeight: 500,
+    // fontWeight: 500,
     fontSize: 30,
     lineHeight: 35,
     textAlign: "center",
