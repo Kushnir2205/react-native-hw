@@ -16,21 +16,19 @@ const Tab = createBottomTabNavigator();
 const Home = () => {
   return (
     <Tab.Navigator
-      screenOptions={() => ({
+      screenOptions={{
         tabBarStyle: {
           height: 64,
           paddingTop: 10,
           paddingBottom: 20,
-
           alignItems: "center",
           alignContent: "center",
           justifyContent: "center",
+          display: "flex",
         },
-      })}
-      tabBarOptions={{
-        showLabel: false,
-        activeTintColor: "#ff6c00",
-        inactiveTintColor: "#212121",
+        tabBarActiveTintColor: "#ff6c00",
+        tabBarInactiveTintColor: "#212121",
+        tabBarShowLabel: false,
       }}
     >
       <Tab.Screen
