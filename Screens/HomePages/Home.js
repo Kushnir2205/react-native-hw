@@ -5,15 +5,21 @@ import CreatePostsScreen from "../MainPages/CreatePostScreen";
 import ProfileScreen from "../MainPages/ProfileScreen";
 import SvgLogOut from "../../assets/svg/SvgLogOut";
 import SvgArrowLeft from "../../assets/svg/SvgArrowLeft";
+import { authSignOutUser } from "../../redux/auth/authOperations";
 
 import SvgGrid from "../../assets/svg/SvgGrid";
 import SvgPlus from "../../assets/svg/SvgPlus";
 import SvgUser from "../../assets/svg/SvgUser";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { useDispatch } from "react-redux";
 
 const Tab = createBottomTabNavigator();
 
 const Home = () => {
+  const dispatch = useDispatch();
+  const handleLogout = () => {
+    dispatch(authSignOutUser());
+  };
   return (
     <Tab.Navigator
       screenOptions={{
@@ -39,7 +45,7 @@ const Home = () => {
 
           headerRight: () => (
             <SvgLogOut
-              onPress={() => navigation.navigate("Login")}
+              onPress={handleLogout}
               title="Return back"
               color="#fff"
               style={styles.logOut}
@@ -68,6 +74,14 @@ const Home = () => {
               style={styles.arrowLeft}
             />
           ),
+          headerRight: () => (
+            <SvgLogOut
+              onPress={handleLogout}
+              title="Return back"
+              color="#fff"
+              style={styles.logOut}
+            />
+          ),
           tabBarButton: (props) => (
             <TouchableOpacity
               {...props}
@@ -87,14 +101,7 @@ const Home = () => {
         component={ProfileScreen}
         options={({ navigation, route }) => ({
           ...createPostsOptions,
-          headerLeft: () => (
-            <SvgArrowLeft
-              onPress={() => navigation.navigate("Posts")}
-              title="Return back"
-              color="#fff"
-              style={styles.arrowLeft}
-            />
-          ),
+          headerShown: false,
           tabBarButton: (props) => (
             <TouchableOpacity
               {...props}

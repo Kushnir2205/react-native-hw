@@ -9,14 +9,24 @@ import { Text, View } from "react-native";
 
 import { useEffect, useState } from "react";
 import PostsItem from "../../components/PostsItem/PostsItem";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectAvatar,
+  selectEmail,
+  selectLogin,
+  selectUser,
+} from "../../redux/auth/authSelections";
 
 const DefaultPostsScreen = ({ route }) => {
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const { email, login, avatar } = user;
   const [posts, setPosts] = useState([
     {
       id: "ksdlflsdnfsldjnfdjfsjdkfn",
       postImg:
         "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Fgoit-react-native-hw-05-dbed3e8b-5429-4e6e-a6ba-fefe43283569/Camera/1609f830-6073-4560-8596-6f26f450b3a3.jpg",
-      postName: "kk",
+      postName: "post",
       postAddress: "Ukraine",
       postLocation: { latitude: 48.383022, longitude: 31.1828699 },
     },
@@ -31,10 +41,10 @@ const DefaultPostsScreen = ({ route }) => {
   return (
     <View style={styles.container}>
       <View style={styles.avatarWrapper}>
-        <Image style={styles.avatarImg} />
+        <Image style={styles.avatarImg} source={{ uri: avatar }} />
         <View>
-          <Text style={styles.avatarName}>Natali Romanova</Text>
-          <Text style={styles.avatarEmail}>email@example.com</Text>
+          <Text style={styles.avatarName}>{login}</Text>
+          <Text style={styles.avatarEmail}>{email}</Text>
         </View>
       </View>
       <FlatList
@@ -83,7 +93,7 @@ const styles = StyleSheet.create({
   avatarName: {
     fontFamily: "Roboto",
     fontStyle: "normal",
-    fontWeight: '700',
+    fontWeight: "700",
     fontSize: 13,
     lineHeight: 15,
 
@@ -92,7 +102,7 @@ const styles = StyleSheet.create({
   avatarEmail: {
     fontFamily: "Roboto",
     fontStyle: "normal",
-    fontWeight: '400',
+    fontWeight: "400",
     fontSize: 11,
     lineHeight: 13,
 

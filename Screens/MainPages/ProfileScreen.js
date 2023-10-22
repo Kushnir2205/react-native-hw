@@ -7,38 +7,50 @@ import { TouchableOpacity } from "react-native";
 import SvgAddButton from "../../assets/svg/SvgAddButton";
 import { Dimensions } from "react-native";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectAvatar,
+  selectLogin,
+  selectUser,
+} from "../../redux/auth/authSelections";
+import SvgLogOut from "../../assets/svg/SvgLogOut";
+import { authSignOutUser } from "../../redux/auth/authOperations";
 
 const ProfileScreen = () => {
-  const [avatar, setAvatar] = useState(null);
+  const dispatch = useDispatch();
 
-  const onLoadAvatar = async () => {
-    const avatarImg = await DocumentPicker.getDocumentAsync({
-      type: "image/*",
-    });
+  const user = useSelector(selectUser);
 
-    if (avatarImg.type === "cancel") return setAvatar(null);
-
-    setAvatar(avatarImg);
+  const handleLogout = () => {
+    dispatch(authSignOutUser());
   };
-
+  console.log(user);
   return (
     <ImageBackground source={backgroundImg} style={styles.bgContainer}>
       <View style={styles.container}>
         <View style={styles.contentWrapper}>
           <View style={styles.avatarWrapper}>
-            <Image style={styles.avatar} source={avatar} />
+            <Image style={styles.avatar} source={{ uri: user.avatar }} />
+
             <TouchableOpacity
-              style={avatar ? styles.btnAddAvatarLoad : styles.btnAddAvatar}
-              onPress={onLoadAvatar}
+              style={
+                user.avatar ? styles.btnAddAvatarLoad : styles.btnAddAvatar
+              }
+              // onPress={onLoadAvatar}
             >
               <SvgAddButton
                 style={
-                  avatar ? styles.btnAddAvatarSvgLoad : styles.btnAddAvatarSvg
+                  user.avatar
+                    ? styles.btnAddAvatarSvgLoad
+                    : styles.btnAddAvatarSvg
                 }
               />
             </TouchableOpacity>
           </View>
-          <Text style={{ ...styles.title, marginTop: 92 }}>Name</Text>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <SvgLogOut />
+          </TouchableOpacity>
+          <Text style={{ ...styles.title, marginTop: 92 }}>{user.login}</Text>
         </View>
       </View>
     </ImageBackground>
@@ -79,7 +91,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "Roboto",
     fontStyle: "normal",
-    fontWeight: '500',
+    fontWeight: "500",
     fontSize: 30,
     lineHeight: 35,
     textAlign: "center",
@@ -145,5 +157,10 @@ const styles = StyleSheet.create({
     fill: "#bdbdbd",
     stroke: "#e8e8e8",
     backgroundColor: "#ffffff",
+  },
+  logoutButton: {
+    position: "absolute",
+    top: 20,
+    right: 20,
   },
 });

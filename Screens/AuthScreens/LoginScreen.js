@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Dimensions, StyleSheet } from "react-native";
+import { logIn } from "../../redux/auth/authOperations";
 
 import {
   View,
@@ -15,28 +16,33 @@ import {
 
 import backgroundImg from "../../assets/image/Photo_background.jpg";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
+
+  const [email, setEmail] = useState(null);
+  const [password, setPassword] = useState(null);
 
   const [isSecureText, setIsSecureText] = useState(true);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [currentFocused, setCurrentFocused] = useState("");
 
   const clearUserForm = () => {
-    setEmail("");
-    setPassword("");
+    setEmail(null);
+    setPassword(null);
   };
 
-  const onSubmitUserRegister = () => {
+  const onSubmitUserLogin = () => {
     if (!email.trim() || !password.trim())
       return console.warn("Будь ласка заповніть поля");
 
+    dispatch(logIn(email, password));
     console.log({ email, password });
 
     handleKeyboardHide();
+    navigation.navigate("Home", { user: { email, password } });
     clearUserForm();
   };
 
@@ -110,12 +116,12 @@ const LoginScreen = () => {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.btn} onPress={onSubmitUserRegister}>
+            <TouchableOpacity style={styles.btn} onPress={onSubmitUserLogin}>
               <Text style={styles.btnText}>Увійти</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.link}
-              onPress={() => navigation.navigate("Registration")}
+              onPress={() => navigation.navigate("Regestration")}
             >
               <Text style={styles.linkText}>
                 Немає акаунту?{" "}

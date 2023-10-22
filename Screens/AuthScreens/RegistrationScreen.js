@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Dimensions, StyleSheet } from "react-native";
-import * as DocumentPicker from "expo-document-picker";
+import * as ImagePicker from "expo-image-picker";
+import { authSignUpUser } from "../../redux/auth/authOperations";
 
 import {
   View,
@@ -18,44 +19,98 @@ import {
 import backgroundImg from "../../assets/image/Photo_background.jpg";
 import SvgAddButton from "../../assets/svg/SvgAddButton";
 import { useNavigation } from "@react-navigation/native";
+import { authStateChange } from "../../redux/auth/authSlice";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { useDispatch } from "react-redux";
+import { nanoid } from "@reduxjs/toolkit";
+import { myStorage } from "../../firebase/config";
 
 const RegistrationScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+
   const [avatar, setAvatar] = useState(null);
-  const [login, setLogin] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [login, setLogin] = useState(null);
+  const [email, setEmail] = useState(null);
+  const [password, setPassword] = useState(null);
 
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [isSecureText, setIsSecureText] = useState(true);
   const [currentFocused, setCurrentFocused] = useState("");
 
   const clearUserForm = () => {
-    setLogin("");
-    setEmail("");
-    setPassword("");
+    setAvatar(null);
+    setLogin(null);
+    setEmail(null);
+    setPassword(null);
   };
 
-  const onSubmitUserRegister = () => {
-    if (!login || !email || !password)
-      return console.warn("Будь ласка заповніть поля");
+  const onSubmitUserRegister = async () => {
+    // if (!login || !email || !password) return console.warn('Будь ласка заповніть поля');
 
-    console.log({ login, email, password, avatar });
+    const photo = avatar
+      ? await uploadImageToServer()
+      : "https://app-react-native-26d3c-default-rtdb.europe-west1.firebasedatabase.app";
 
-    handleKeyboardHide();
-    navigation.navigate("Home", { user: { login, email, password } });
-    clearUserForm();
+    dispatch(authSignUpUser({ photo, login, email, password })).then((data) => {
+      if (data === undefined || !data.uid) {
+        alert(`Реєстрацію не виконано!`);
+        return;
+      }
+      dispatch(authStateChange({ stateChange: true }));
+      console.log(data);
+    });
+
+    // console.log({ login, email, password, avatar });
+
+    // dispatch(authStateChange({ stateChange: true }));
+
+    // navigation.navigate('Home', { user: { login, email, password } });
+    // handleKeyboardHide();
+    // clearUserForm();
   };
 
   const onLoadAvatar = async () => {
-    const avatarImg = await DocumentPicker.getDocumentAsync({
-      type: "image/*",
+    if (avatar) {
+      setAvatar(null);
+      return;
+    }
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 4],
+      quality: 1,
     });
 
-    if (avatarImg.type === "cancel") return setAvatar(null);
+    if (!result.canceled) {
+      setAvatar(result.assets[0].uri);
+    }
+  };
 
-    setAvatar(avatarImg);
-    console.log(avatarImg);
+  const uploadImageToServer = async () => {
+    const uniquePostId = nanoid();
+
+    if (avatar) {
+      try {
+        const response = await fetch(avatar);
+
+        const file = await response.blob();
+
+        const imageRef = ref(myStorage, `avatar/${uniquePostId}`);
+
+        const uploadTask = await uploadBytesResumable(imageRef, file);
+        const downloadURL = await getDownloadURL(imageRef);
+
+        return downloadURL;
+      } catch (error) {
+        console.warn("uploadImageToServer: ", error);
+      }
+    }
   };
 
   const handleFocus = (currentFocusInput = "") => {
@@ -78,7 +133,7 @@ const RegistrationScreen = () => {
         <ImageBackground source={backgroundImg} style={styles.bgContainer}>
           <View style={styles.contentWrapper}>
             <View style={styles.avatarWrapper}>
-              <Image style={styles.avatar} source={avatar} />
+              <Image style={styles.avatar} source={{ uri: avatar }} />
               <TouchableOpacity
                 style={avatar ? styles.btnAddAvatarLoad : styles.btnAddAvatar}
                 onPress={onLoadAvatar}
