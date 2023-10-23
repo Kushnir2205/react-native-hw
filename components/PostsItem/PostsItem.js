@@ -6,6 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 const PostsItem = ({ postImg, postName, postAddress, postLocation }) => {
   const navigation = useNavigation();
 
+  // console.log("Post Data:", postImg, postName, postAddress, postLocation);
   return (
     <View style={styles.postItem}>
       <Image style={styles.postImg} source={{ uri: postImg }} />
@@ -42,7 +43,7 @@ const styles = StyleSheet.create({
   },
   postImg: {
     height: 240,
-    maxWidth: 343,
+    width: 343,
 
     marginBottom: 8,
 

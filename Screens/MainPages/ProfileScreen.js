@@ -8,23 +8,34 @@ import SvgAddButton from "../../assets/svg/SvgAddButton";
 import { Dimensions } from "react-native";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  selectAvatar,
-  selectLogin,
-  selectUser,
-} from "../../redux/auth/authSelections";
+import { selectUser } from "../../redux/auth/authSelections";
 import SvgLogOut from "../../assets/svg/SvgLogOut";
 import { authSignOutUser } from "../../redux/auth/authOperations";
+import { FlatList } from "react-native-gesture-handler";
+import { selectPosts } from "../../redux/posts/postsSelector";
+import PostsItem from "../../components/PostsItem/PostsItem";
 
 const ProfileScreen = () => {
+  const [avatar, setAvatar] = useState();
   const dispatch = useDispatch();
 
+  const posts = useSelector(selectPosts);
   const user = useSelector(selectUser);
+
+  const onLoadAvatar = async () => {
+    const avatarImg = await DocumentPicker.getDocumentAsync({
+      type: "image/*",
+    });
+
+    if (avatarImg.type === "cancel") return setAvatar(null);
+
+    setAvatar(avatarImg);
+  };
 
   const handleLogout = () => {
     dispatch(authSignOutUser());
   };
-  console.log(user);
+  console.log(posts);
   return (
     <ImageBackground source={backgroundImg} style={styles.bgContainer}>
       <View style={styles.container}>
@@ -36,7 +47,7 @@ const ProfileScreen = () => {
               style={
                 user.avatar ? styles.btnAddAvatarLoad : styles.btnAddAvatar
               }
-              // onPress={onLoadAvatar}
+              onPress={onLoadAvatar}
             >
               <SvgAddButton
                 style={
@@ -51,6 +62,20 @@ const ProfileScreen = () => {
             <SvgLogOut />
           </TouchableOpacity>
           <Text style={{ ...styles.title, marginTop: 92 }}>{user.login}</Text>
+
+          <FlatList
+            data={posts}
+            renderItem={({ item }) => (
+              <PostsItem
+                postImg={item.image}
+                postName={item.title}
+                postAddress={item.content}
+                postLocation={item.location}
+                // post={item}
+              />
+            )}
+            keyExtractor={(post) => post.id}
+          />
         </View>
       </View>
     </ImageBackground>
@@ -70,7 +95,6 @@ const styles = StyleSheet.create({
   bgContainer: {
     // flexDirection: 'row',
     // alignItems: 'flex-start',
-
     resizeMode: "cover",
     justifyContent: "center",
     width: Dimensions.get("window").width,

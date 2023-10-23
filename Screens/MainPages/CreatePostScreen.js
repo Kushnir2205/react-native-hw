@@ -26,10 +26,13 @@ import {
 import SvgTrash from "../../assets/svg/SvgTrash";
 import SvgLocation from "../../assets/svg/SvgLocation";
 import SvgLoadPost from "../../assets/svg/SvgLoadPost";
+import { addPost } from "../../redux/posts/postsSlice";
+import { useDispatch } from "react-redux";
 
 const CreatePostsScreen = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
+  const dispatch = useDispatch();
 
   const [hasPermission, setHasPermission] = useState(null);
   const [cameraRef, setCameraRef] = useState(null);
@@ -88,6 +91,16 @@ const CreatePostsScreen = () => {
     if (!postImg || !postName.trim() || !postLocation)
       return console.warn("Будь ласка завантажте фото та заповніть поля");
 
+    const post = {
+      id: new Date().toISOString(),
+      title: postName.trim(),
+      content: postAddress.trim(),
+      location: postLocation,
+      image: postImg,
+    };
+
+    dispatch(addPost(post));
+
     console.log({ postImg, postName, postAddress, postLocation });
 
     handleKeyboardHide();
@@ -111,19 +124,6 @@ const CreatePostsScreen = () => {
       }
     }
 
-    // if (!cameraRef && postImg) {
-    //   try {
-    //     const avatarImg = await DocumentPicker.getDocumentAsync({
-    //       type: 'image/*',
-    //     });
-
-    //     if (avatarImg.type === 'cancel') return setPostImg('');
-
-    //     setPostImg(avatarImg);
-    //   } catch (error) {
-    //     console.log('Error > ', error.message);
-    //   }
-    // }
     addImageLocation();
   };
 
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
   loadWrapperText: {
     fontFamily: "Roboto",
     fontStyle: "normal",
-    fontWeight: '400',
+    fontWeight: "400",
     fontSize: 16,
     lineHeight: 19,
 
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
   btnText: {
     fontFamily: "Roboto",
     fontStyle: "normal",
-    fontWeight: '400',
+    fontWeight: "400",
     fontSize: 16,
 
     textAlign: "center",
